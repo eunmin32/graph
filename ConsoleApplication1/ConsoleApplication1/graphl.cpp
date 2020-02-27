@@ -17,10 +17,15 @@ Also contains depth first search: the node intialize first takes priority for de
 using namespace std;
 
 //------------------- constructors/destructor  -------------------------------
-GraphL::GraphL() : graphNodes{ nullptr }, size{0}{
-}
+GraphL::GraphL() : graphNodes{ nullptr }, size{ 0 }{}
 
 GraphL::~GraphL(){
+	for (int i = 1; i <= size; i++) {
+		edgeNodeDelete(graphNodes[i]->edgeHead);
+		delete graphNodes[i]->data;
+		delete graphNodes[i];
+	}
+	delete[] graphNodes;
 }
 
 //---------------------------- buildGraph -------------------------------------
@@ -35,7 +40,8 @@ void GraphL::buildGraph(ifstream& infile){
 			stringstream S;
 			S.str(line);
 			S >> size;
-			graphNodes = new GraphNode * [size];
+			graphNodes = new GraphNode *[size + 1];
+			graphNodes[0] = nullptr;
 			for (int i = 1; i <= size; i++) {
 				getline(infile, line);
 				initNodes(i, line);
@@ -136,5 +142,16 @@ void GraphL::setNextNode(int nodePlace, int adjNode){
 		}
 		curr->nextEdge = new EdgeNode();
 		curr->nextEdge->adjGraphNode = adjNode;
+	}
+}
+
+//---------------------------- edgeNodeDelete -------------------------------------
+//Helper for deconstructor Delete EdgeNode
+// Preconditions: None
+// Postconditions: delete EdgeNode
+void GraphL::edgeNodeDelete(EdgeNode* deletHepler) {
+	if (deletHepler != nullptr) {
+		edgeNodeDelete(deletHepler->nextEdge);
+		delete deletHepler;
 	}
 }

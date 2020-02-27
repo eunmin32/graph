@@ -19,6 +19,7 @@ class GraphL {
 	public:
 		GraphL();	//Constructor
 		~GraphL();	//Deconstructor
+		
 		void buildGraph(ifstream& file);	//build the graph based on data on the data in textfile connect node to graphNode**
 		void depthFirstSearch();	//Display result of depth-first search and mark all node visited
 		void depthFirstSearchHelper(int initial);	//Helper of depth-first search
@@ -38,4 +39,5 @@ class GraphL {
 		int size;	//the total number of the nodes
 		void initNodes(int nodePlace, string name);	//initialize name and priority of the nodes
 		void setNextNode(int nodePlace, int adjNode);	//connect edgenode to graph nodes based on the priority
+		void edgeNodeDelete(EdgeNode* deletHepler); //Helper for deconstructor Delete EdgeNode
 };
