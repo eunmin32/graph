@@ -1,17 +1,29 @@
+/*
+------------------------------------------------ graphm.h -------------------------------------------------------
+Eunmin Lee CSS343 A
+Creation Date: 2/24/2020
+Date of Last Modification: 2/26/2020
+------------------------------------------------------------------------------------------------------------------
+Purpose - Data structure Graph using adjacency matrix
+------------------------------------------------------------------------------------------------------------------
+Implementation of graph stores nodedata
+Also contains Dijkstra's algorithm (find shortest path)
+------------------------------------------------------------------------------------------------------------------
+*/
 #include "graphm.h"
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <iostream>
-#include <istream>
 #include <algorithm>
 using namespace std;
 
-GraphM::GraphM() {
+//------------------- constructors/destructor  -------------------------------
+GraphM::GraphM(){
 	size = 0;
 	for (int i = 0; i < MAXNODES; i++) {
 		for (int j = 0; j < MAXNODES; j++) {
-			C[i][j] = 9999;
+			C[i][j] = MAXDIS;
 		}
 		data[i] = new NodeData();
 	}
@@ -23,31 +35,41 @@ GraphM::~GraphM() {
 	}
 }
 
+//---------------------------- buildGraph -------------------------------------
+// Build the graph based on data on the data in textfile
+// Preconditions: ifstream must be created in main function
+// Postconditions: Set value at data[]* and size, and fill up C[][] 
 void GraphM::buildGraph(ifstream& infile){ 
 	string line;
 	if (infile.is_open()) {
 		getline(infile, line);
-		stringstream S;
-		S.str(line);
-		S >> size;
-		for (int i = 1; i <= size; i++) {
-			(*data[i]).setData(infile);
-			insertEdge(i, i, 0);
-		}
-		
-		int a, b, c;
-		while (line != "0 0 0") {
-			getline(infile, line); 
+		if (line != "") {
 			stringstream S;
 			S.str(line);
-			S >> a;
-			S >> b;
-			S >> c;
-			insertEdge(a, b, c);
+			S >> size;
+			for (int i = 1; i <= size; i++) {
+				(*data[i]).setData(infile);
+				insertEdge(i, i, 0);
+			}
+
+			int a, b, c;
+			while (line != "0 0 0") {
+				getline(infile, line);
+				stringstream S;
+				S.str(line);
+				S >> a;
+				S >> b;
+				S >> c;
+				insertEdge(a, b, c);
+			}
 		}
 	}
 }
 
+//---------------------------- findShortestPath -------------------------------------
+// //Do Dijkstra's algorthim 
+// Preconditions: Node
+// Postconditions: Store the shortes path in TableType T[][]
 void GraphM::findShortestPath(){
 	int beginningV = 1;
 	while (beginningV <= size) {
@@ -63,7 +85,7 @@ void GraphM::findShortestPath(){
 		for (int vertex = 1; vertex < size; vertex++) { //repeat size - 1 times
 
 			//selecting next vertex (finding shortest path);
-			int minDis = 9999;
+			int minDis = MAXDIS;
 			int currVCandidate = currV;
 			for (int i = 1; i <= size; i++) {
 				if (!T[beginningV][i].visited) {
@@ -92,16 +114,10 @@ void GraphM::findShortestPath(){
 	
 }
 
-// 
-string GraphM::traversePath(int from, int to) {
-	string path; 
-	if (from == to) {
-		return to_string(from) + " ";
-	}	
-	path += traversePath(from, T[from][to].path) + to_string(to) + " ";
-	return path;
-}
-
+//---------------------------- displayAll -------------------------------------
+// Display shortest distance of all Nodes, path to cout
+// Preconditions: Node
+// Postconditions: Node
 void GraphM::displayAll(){
 	cout << endl;
 	cout << "Description               From node  To node  Dijkstra's  Path    " << endl;
@@ -112,7 +128,7 @@ void GraphM::displayAll(){
 				cout << "                               ";
 				cout << fromNode << "       "; 
 				cout << toNode << "       ";
-				if (T[fromNode][toNode].dist == 9999) {
+				if (T[fromNode][toNode].dist == MAXDIS) {
 					cout << "---";
 				} else {
 					cout << T[fromNode][toNode].dist << "          ";
@@ -125,12 +141,16 @@ void GraphM::displayAll(){
 	}
 }
 
+//---------------------------- display -------------------------------------
+// Display all the adjacent nodes of all nodes
+// Preconditions: Node
+// Postconditions: Node
 void GraphM::display(int from, int to) {
 	if (to <= size && from <= size) {
 		cout << endl << from << "       ";
 		cout << to << "       ";
 
-		if (T[from][to].dist == 9999) {
+		if (T[from][to].dist == MAXDIS) {
 			cout << "---" << endl;
 		}
 		else {
@@ -147,24 +167,11 @@ void GraphM::display(int from, int to) {
 	}
 }
 
-bool GraphM::insertEdge(int nodeA, int nodeB, int distance){
-	if (C[nodeA][nodeB] != 9999) {
-		cout << "Edge Already Existed";
-		return false;
-	}
-	C[nodeA][nodeB] = distance;
-	return true;
-}
 
-bool GraphM::removeEdge(int nodeA, int nodeB){
-	if (C[nodeA][nodeB] == 9999) {
-		cout << "Didn't have edge";
-		return false;
-	}
-	C[nodeA][nodeB] = 9999;
-	return true;
-}
-
+//---------------------------- printOnlyGraph -------------------------------------
+// Print cost table of the graph
+// Preconditions: Node
+// Postconditions: Node
 void GraphM::printOnlyGraph(){
 	cout << "COST TABLE :             ";
 	for (int i = 1; i <= size; i++) {\
@@ -174,7 +181,7 @@ void GraphM::printOnlyGraph(){
 		cout << endl << *data[i] << ": " << endl;
 		cout << "                         ";
 		for (int j = 1; j <= size; j++) {
-			if (C[i][j] >= 9999)
+			if (C[i][j] >= MAXDIS)
 				cout << "∞  ";
 			else 
 				cout << C[i][j] << " ";
@@ -185,3 +192,43 @@ void GraphM::printOnlyGraph(){
 	}
 
 }
+
+//---------------------------- insertEdge -------------------------------------
+// Insert an edge into graph between two given nodes
+// Preconditions: Assuming highest possible distance is MAXDIS
+// Postconditions: Node
+bool GraphM::insertEdge(int nodeA, int nodeB, int distance) {
+	if (C[nodeA][nodeB] != MAXDIS) {
+		cout << "Edge Already Existed";
+		return false;
+	}
+	C[nodeA][nodeB] = distance;
+	return true;
+}
+
+//---------------------------- removeEdge -------------------------------------
+// Remove an edge from the graph
+// Preconditions: Assuming highest possible distance is MAXDIS
+// Postconditions: Node
+bool GraphM::removeEdge(int nodeA, int nodeB) {
+	if (C[nodeA][nodeB] == MAXDIS) {
+		cout << "Didn't have edge";
+		return false;
+	}
+	C[nodeA][nodeB] = MAXDIS;
+	return true;
+}
+
+//---------------------------- traversePath -------------------------------------
+// Return string of Dijkstra's path
+// Preconditions: None
+// Postconditions: None
+string GraphM::traversePath(int from, int to) {
+	string path;
+	if (from == to) {
+		return to_string(from) + " ";
+	}
+	path += traversePath(from, T[from][to].path) + to_string(to) + " ";
+	return path;
+}
+

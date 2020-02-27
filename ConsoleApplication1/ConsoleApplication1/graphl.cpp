@@ -1,15 +1,32 @@
+/*
+------------------------------------------------ graphl.h -------------------------------------------------------
+Eunmin Lee CSS343 A
+Creation Date: 2/24/2020
+Date of Last Modification: 2/26/2020
+------------------------------------------------------------------------------------------------------------------
+Purpose - Data structure Graph using linked list.
+------------------------------------------------------------------------------------------------------------------
+Implementation of graph stores nodedata
+Also contains depth first search: the node intialize first takes priority for depth first search
+------------------------------------------------------------------------------------------------------------------
+*/
 #include "graphl.h"
 #include <sstream>
 #include <stack> 
 #include <vector>
 using namespace std;
 
+//------------------- constructors/destructor  -------------------------------
 GraphL::GraphL() : graphNodes{ nullptr }, size{0}{
 }
 
 GraphL::~GraphL(){
 }
 
+//---------------------------- buildGraph -------------------------------------
+// Build the graph based on data on the data in textfile
+// Preconditions: ifstream must be created in main function
+// Postconditions:  Connect dynamically allocated node to graphNode**
 void GraphL::buildGraph(ifstream& infile){
 	if (infile.is_open()) {
 		string line;
@@ -37,12 +54,20 @@ void GraphL::buildGraph(ifstream& infile){
 	}
 }
 
+//---------------------------- depthFirstSearch -------------------------------------
+// Display result of depth-first search
+// Preconditions: None
+// Postconditions:  Mark all node visited
 void GraphL::depthFirstSearch(){
 	cout << endl << "Depth-first ordering" << ": " ;
 	depthFirstSearchHelper(1);
 	
 }
 
+//---------------------------- depthFirstSearchHelper -------------------------------------
+// Helper of depthFirstSearch: Display result of depth-first search
+// Preconditions: None
+// Postconditions:  Mark all node visited
 void GraphL::depthFirstSearchHelper(int initial) {	
 	EdgeNode* iiii = graphNodes[initial]->edgeHead;
 	graphNodes[initial]->visited = true;
@@ -56,6 +81,10 @@ void GraphL::depthFirstSearchHelper(int initial) {
 	
 }
 
+//---------------------------- displayGraph -------------------------------------
+// Display shortest distance, path to cout
+// Preconditions: None
+// Postconditions: None
 void GraphL::displayGraph(){
 	cout << endl << "Graph: " << endl;
 	for (int i = 1; i <= size; i++) {
@@ -71,11 +100,19 @@ void GraphL::displayGraph(){
 	}
 }
 
+//---------------------------- initNodes -------------------------------------
+// Initialize name and priority of the nodes
+// Preconditions: None
+// Postconditions: Dynamically locate GraphNode and NodeData to graphNodes[]
 void GraphL::initNodes(int nodePlace, string name) {
 	graphNodes[nodePlace] = new GraphNode();
 	graphNodes[nodePlace]->data = new NodeData(name);
 }
 
+//---------------------------- setNextNode -------------------------------------
+// Connect edgeNode to graphNodes based on the priority
+// Preconditions: None
+// Postconditions: Dynamically locate EdgeNode
 void GraphL::setNextNode(int nodePlace, int adjNode){
 	if (graphNodes[nodePlace]->edgeHead == nullptr) {
 		graphNodes[nodePlace]->edgeHead = new EdgeNode();

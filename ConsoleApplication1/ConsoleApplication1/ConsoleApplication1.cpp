@@ -18,43 +18,6 @@
 #include "graphm.h"
 using namespace std;
 
-/*
-int main() {
-	ifstream infile("data31.txt");
-	if (!infile) {
-		cout << "File could not be opened." << endl;
-		return 1;
-	}
-
-	GraphM G;
-	G.buildGraph(infile);
-	if (infile.eof())
-		return 1;
-	G.printOnlyGraph();
-
-	G.findShortestPath();
-	cout << "****************************************************" << endl;
-	G.displayAll();
-	G.display(3, 1);
-	G.display(1, 2);
-	G.display(1, 4);
-	
-	ifstream infile("data32.txt");
-	if (!infile) {
-		cout << "File could not be opened." << endl;
-		return 1;
-	}
-
-	GraphL L;
-	L.buildGraph(infile);
-	if (infile.eof())
-		return 1;
-	L.displayGraph();
-	L.depthFirstSearch();
-}*/
-
-
-
 
 int main() {
 
@@ -69,8 +32,9 @@ int main() {
 	for (;;) {
 		GraphM G;
 		G.buildGraph(infile1);
-		if (infile1.eof())
+		if (infile1.eof()) {
 			break;
+		}
 		G.findShortestPath();
 		G.displayAll();              // display shortest distance, path to cout
 		G.display(3, 1);              // display path from node 3 to 1 to cout
